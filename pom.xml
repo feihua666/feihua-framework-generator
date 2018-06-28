@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>feihua</groupId>
+    <artifactId>feihua-framework-generator</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.28</version>
+        </dependency>
+        <dependency>
+            <groupId>feihua</groupId>
+            <artifactId>feihua-mybatis-pom</artifactId>
+            <version>3.4.4</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- compiler插件, 设定JDK版本 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <showWarnings>true</showWarnings>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <!-- 资源文件插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!-- war打包插件, 设定war包名称不带版本号 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <warName>${project.artifactId}</warName>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <!-- 先指定 src/main/resources下所有文件及文件夹为资源文件 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <!-- 设置对某些文件进行过滤， 这里对*.properties进行过虑，即这些文件中的${key}会被替换掉为真正的值 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>yangwei</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!--改这里，类的作者注释-->
+                <comment.author>yangwei</comment.author>
+                <!--改这里，表名-->
+                <table.name></table.name>
+                <!--改这里，实体名-->
+                <model.name></model.name>
+
+                <!--数据库相关-->
+                <jdbc.connector.jar>C:/Users/Lenovo/.m2/repository/mysql/mysql-connector-java/5.1.36/mysql-connector-java-5.1.36.jar</jdbc.connector.jar>
+                <jdbc.url>jdbc:mysql://localhost/feihua-framework-base?useUnicode=true&amp;characterEncoding=UTF-8&amp;allowMultiQueries=true</jdbc.url>
+                <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
+                <jdbc.user>root</jdbc.user>
+                <jdbc.password>root</jdbc.password>
+
+                <!--service项目的地址,生成前请确认有这个地址路径是存在的-->
+                <targetProject>E:\\git source\\feihua-framework-base-service\\feihua-framework-base-service-api\\src\\main\\java</targetProject>
+                <!--改这里，实体包-->
+                <model.targetPackage>com.feihua.framework.base.modules.wwd.po</model.targetPackage>
+
+                <xmlmapper.targetPackage>com.feihua.framework.base.mapper</xmlmapper.targetPackage>
+
+                <client.targetPackage>com.feihua.framework.base.mapper</client.targetPackage>
+                <!-- dao父级接口  -->
+                <client.rootInterface>feihua.jdbc.api.dao.CrudDao</client.rootInterface>
+
+                <service.targetPackage>com.feihua.framework.base.modules.wwd.api</service.targetPackage>
+                <interfaceBaseService>feihua.jdbc.api.service.ApiBaseService</interfaceBaseService>
+
+                <serviceimpl.targetPackage>com.feihua.framework.base.impl</serviceimpl.targetPackage>
+                <abstractBaseService>feihua.jdbc.api.service.impl.ApiBaseServiceImpl</abstractBaseService>
+
+                <controller.dto.targetPackage>com.feihua.framework.rest.modules.wwd.dto</controller.dto.targetPackage>
+                <controller.targetPackage>com.feihua.framework.rest.modules.wwd.mvc</controller.targetPackage>
+                <controller.targetProject>E:\\git source\\feihua-framework-base-rest\\src\\main\\java</controller.targetProject>
+                <controller.classMappingPath>/wwd</controller.classMappingPath>
+                <controller.methodMappingPath>/wwd</controller.methodMappingPath>
+                <controller.methodRequiresPermissionsPre>wwd:</controller.methodRequiresPermissionsPre>
+                <controller.moduleName>wwd</controller.moduleName>
+                <controller.controllerComment>汪汪队用户管理</controller.controllerComment>
+                <controller.moduleComment>汪汪队用户</controller.moduleComment>
+                <controller.updateFormSuperClass>com.feihua.framework.rest.modules.common.dto.UpdateFormDto</controller.updateFormSuperClass>
+
+                <api.service.prifix></api.service.prifix>
+                <pojo.basepo>feihua.jdbc.api.pojo.BasePo</pojo.basepo>
+                <pojo.basedto>feihua.jdbc.api.pojo.BaseDto</pojo.basedto>
+
+                <!-- 生成文件开头 -->
+                <treetable>false</treetable>
+                <generator.model>true</generator.model>
+                <generator.dto>true</generator.dto>
+                <generator.xmlMapper>true</generator.xmlMapper>
+                <generator.dao>true</generator.dao>
+                <generator.serviceImpl>true</generator.serviceImpl>
+                <generator.service>true</generator.service>
+                <generator.service.searchDsfMethod>true</generator.service.searchDsfMethod>
+                <!--不生成controller类-->
+                <generator.controller>false</generator.controller>
+
+
+            </properties>
+        </profile>
+    </profiles>
+</project>
