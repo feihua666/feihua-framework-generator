@@ -7,18 +7,15 @@
     <parent>
         <groupId>feihua</groupId>
         <artifactId>feihua-parent-pom</artifactId>
-        <version>1.0.1.20180802</version>
+        <version>1.0.0.2018-08-13</version>
     </parent>
 
     <groupId>feihua</groupId>
     <artifactId>feihua-framework-generator</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0.20180802</version>
 
     <properties>
 
-        <feihua-jdbc-api.version>1.0.0.20180730_rc</feihua-jdbc-api.version>
-        <mybatis-gernerator.version></mybatis-gernerator.version>
     </properties>
     <dependencies>
         <dependency>
@@ -42,7 +39,7 @@
         <dependency>
             <groupId>feihua</groupId>
             <artifactId>feihua-jdbc-api</artifactId>
-            <version>${feihua-jdbc-api.version}</version>
+            <version>${feihua-framework.version}</version>
         </dependency>
     </dependencies>
 
