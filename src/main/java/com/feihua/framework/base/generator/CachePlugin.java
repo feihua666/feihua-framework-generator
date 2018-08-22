@@ -24,7 +24,7 @@ public class CachePlugin extends org.mybatis.generator.plugins.CachePlugin {
         for (int i = 0; i < elements.size(); i++) {
             Element element = elements.get(i);
             if(element instanceof XmlElement && ((XmlElement) element).getName().equals("cache")){
-                ((XmlElement) element).addAttribute(new Attribute("type","com.feihua.framework.base.mybatis.cache.RedisCache"));
+                ((XmlElement) element).addAttribute(new Attribute("type","com.feihua.framework.mybatis.orm.cache.RedisCache"));
             }
         }
         return true;

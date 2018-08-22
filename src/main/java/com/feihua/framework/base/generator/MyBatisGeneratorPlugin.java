@@ -4,6 +4,7 @@ import com.feihua.framework.base.pojo.ControllerModel;
 import com.feihua.utils.io.FileUtils;
 import com.feihua.utils.spring.SpringContextHolder;
 import com.github.pagehelper.Page;
+import feihua.jdbc.api.pojo.BaseConditionDto;
 import feihua.jdbc.api.pojo.PageResultDto;
 import feihua.jdbc.api.service.ApiBaseTreeService;
 import freemarker.template.Configuration;
@@ -41,7 +42,8 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
 
     public static String baseTreePoFullPath = "feihua.jdbc.api.pojo.BaseTreePo";
     public static String springContextHolderFullPath = "com.feihua.utils.spring.SpringContextHolder";
-    public static String baseConditionDtoFullPath = "com.feihua.framework.base.dto.BaseConditionDto";
+    public static String baseConditionDtoFullPath = "feihua.jdbc.api.pojo.BaseConditionDto";
+
     public static String pageAndOrderbyParamDtoFullPath = "feihua.jdbc.api.pojo.PageAndOrderbyParamDto";
 
     public static String clientSearchDsfMethodNameFullPathKey = "clientSearchDsfMethodNameFullPath";

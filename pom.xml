@@ -7,7 +7,7 @@
     <parent>
         <groupId>feihua</groupId>
         <artifactId>feihua-parent-pom</artifactId>
-        <version>1.0.0.2018-08-13</version>
+        <version>1.1.0.2018-08-21</version>
     </parent>
 
     <groupId>feihua</groupId>
@@ -120,9 +120,9 @@
                 <!--改这里，类的作者注释-->
                 <comment.author>yangwei</comment.author>
                 <!--改这里，表名-->
-                <table.name>weixin_user</table.name>
+                <table.name>weixin_menu</table.name>
                 <!--改这里，实体名-->
-                <model.name>WeixinUserPo</model.name>
+                <model.name>WeixinMenuPo</model.name>
 
                 <!--数据库相关-->
                 <jdbc.connector.jar>C:/Users/Lenovo/.m2/repository/mysql/mysql-connector-java/5.1.36/mysql-connector-java-5.1.36.jar</jdbc.connector.jar>
@@ -132,11 +132,11 @@
                 <jdbc.password>root</jdbc.password>
 
                 <!--service项目的地址,生成前请确认有这个地址路径是存在的-->
-                <model.targetProject>F:\\git source\\feihua-wechat-service\\feihua-wechat-service-api\\src\\main\\java</model.targetProject>
-                <xmlmapper.targetProject>F:\\git source\\feihua-wechat-service\\feihua-wechat-service-impl\\src\\main\\java</xmlmapper.targetProject>
-                <client.targetProject>F:\\git source\\feihua-wechat-service\\feihua-wechat-service-impl\\src\\main\\java</client.targetProject>
+                <model.targetProject>E:\\git source\\feihua-wechat-service\\feihua-wechat-service-api\\src\\main\\java</model.targetProject>
+                <xmlmapper.targetProject>E:\\git source\\feihua-wechat-service\\feihua-wechat-service-impl\\src\\main\\java</xmlmapper.targetProject>
+                <client.targetProject>E:\\git source\\feihua-wechat-service\\feihua-wechat-service-impl\\src\\main\\java</client.targetProject>
                 <!--改这里，实体包-->
-                <model.targetPackage>com.feihua.wechat.common.po</model.targetPackage>
+                <model.targetPackage>com.feihua.wechat.publicplatform.po</model.targetPackage>
 
                 <xmlmapper.targetPackage>com.feihua.wechat.mapper</xmlmapper.targetPackage>
 
@@ -144,40 +144,40 @@
                 <!-- dao父级接口  -->
                 <!-- 一般无需修改 -->
                 <client.rootInterface>feihua.jdbc.api.dao.CrudDao</client.rootInterface>
-
-                <service.targetPackage>com.feihua.wechat.common.api</service.targetPackage>
+                <!--改这里，api-->
+                <service.targetPackage>com.feihua.wechat.publicplatform.api</service.targetPackage>
                 <!-- 一般无需修改 -->
                 <interfaceBaseService>feihua.jdbc.api.service.ApiBaseService</interfaceBaseService>
-
-                <serviceimpl.targetPackage>com.feihua.wechat.impl</serviceimpl.targetPackage>
+                <!-- 改这里 ，impl -->
+                <serviceimpl.targetPackage>com.feihua.wechat.publicplatform</serviceimpl.targetPackage>
                 <!-- 一般无需修改 -->
                 <abstractBaseService>feihua.jdbc.api.service.impl.ApiBaseServiceImpl</abstractBaseService>
 
-                <controller.dto.targetPackage>com.feihua.framework.rest.modules.wwd.dto</controller.dto.targetPackage>
-                <controller.targetPackage>com.feihua.framework.rest.modules.wwd.mvc</controller.targetPackage>
-                <controller.targetProject>E:\\git source\\feihua-framework-base-rest\\src\\main\\java</controller.targetProject>
-                <controller.classMappingPath>/wwd</controller.classMappingPath>
-                <controller.methodMappingPath>/wwd</controller.methodMappingPath>
-                <controller.methodRequiresPermissionsPre>wwd:</controller.methodRequiresPermissionsPre>
-                <controller.moduleName>wwd</controller.moduleName>
-                <controller.controllerComment>汪汪队用户管理</controller.controllerComment>
-                <controller.moduleComment>汪汪队用户</controller.moduleComment>
-                <controller.updateFormSuperClass>com.feihua.framework.rest.modules.common.dto.UpdateFormDto</controller.updateFormSuperClass>
+                <controller.dto.targetPackage>com.feihua.wechat.rest.publicplatform.dto</controller.dto.targetPackage>
+                <controller.targetPackage>com.feihua.wechat.rest.publicplatform.mvc</controller.targetPackage>
+                <controller.targetProject>E:\\git source\\feihua-wechat-rest\\src\\main\\java</controller.targetProject>
+                <controller.classMappingPath>/weixinmenu</controller.classMappingPath>
+                <controller.methodMappingPath>/menu</controller.methodMappingPath>
+                <controller.methodRequiresPermissionsPre>weixinmenu:</controller.methodRequiresPermissionsPre>
+                <controller.moduleName></controller.moduleName>
+                <controller.controllerComment>微信菜单管理</controller.controllerComment>
+                <controller.moduleComment>微信菜单</controller.moduleComment>
+                <controller.updateFormSuperClass>com.feihua.framework.rest.dto.UpdateFormDto</controller.updateFormSuperClass>
 
                 <api.service.prifix></api.service.prifix>
                 <pojo.basepo>feihua.jdbc.api.pojo.BasePo</pojo.basepo>
                 <pojo.basedto>feihua.jdbc.api.pojo.BaseDto</pojo.basedto>
 
                 <!-- 生成文件开头 -->
-                <treetable>false</treetable>
+                <treetable>true</treetable>
                 <generator.model>true</generator.model>
                 <generator.dto>true</generator.dto>
                 <generator.xmlMapper>true</generator.xmlMapper>
-                <generator.dao>true</generator.dao>
-                <generator.serviceImpl>true</generator.serviceImpl>
-                <generator.service>true</generator.service>
+                <generator.dao>false</generator.dao>
+                <generator.serviceImpl>false</generator.serviceImpl>
+                <generator.service>false</generator.service>
                 <generator.service.searchDsfMethod>true</generator.service.searchDsfMethod>
-                <!--不生成controller类-->
+                <!--生成controller类-->
                 <generator.controller>false</generator.controller>
 
 
