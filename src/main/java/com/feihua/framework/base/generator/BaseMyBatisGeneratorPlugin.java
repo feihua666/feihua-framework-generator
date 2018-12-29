@@ -97,6 +97,21 @@ public class BaseMyBatisGeneratorPlugin extends PluginAdapter {
     }
 
     @Override
+    public boolean clientSelectByExampleWithBLOBsMethodGenerated(Method method, Interface interfaze, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    @Override
+    public boolean clientSelectByExampleWithBLOBsMethodGenerated(Method method, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+        return false;
+    }
+
+    public boolean clientUpdateByPrimaryKeyWithoutBLOBsMethodGenerated(
+            Method method, TopLevelClass topLevelClass,
+            IntrospectedTable introspectedTable) {
+        return false;
+    }
+    @Override
     public boolean clientUpdateByPrimaryKeySelectiveMethodGenerated(Method method, Interface interfaze, IntrospectedTable introspectedTable) {
         return false;
     }

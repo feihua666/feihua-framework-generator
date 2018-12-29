@@ -16,12 +16,12 @@ import java.util.Iterator;
  * Created by yangwei
  * Created at 2017/8/25 9:11
  */
-public class DeleteFlagSelectiveElementGenerator extends
+public class DeleteFlagSelectiveWithUpdateUserElementGenerator extends
         AbstractXmlElementGenerator {
 
-    public static String statementId = "deleteFlagSelective";
+    public static String statementId = "deleteFlagSelectiveWithUpdateUser";
 
-    public DeleteFlagSelectiveElementGenerator() {
+    public DeleteFlagSelectiveWithUpdateUserElementGenerator() {
         super();
     }
     public void addElements(XmlElement parentElement) {
@@ -58,20 +58,51 @@ public class DeleteFlagSelectiveElementGenerator extends
         while (iter.hasNext()) {
             IntrospectedColumn introspectedColumn = iter.next();
 
-            if(!"del_flag".equalsIgnoreCase(introspectedColumn.getActualColumnName())){
+            if("del_flag".equalsIgnoreCase(introspectedColumn.getActualColumnName())){
+                sb.append(MyBatis3FormattingUtilities
+                        .getEscapedColumnName(introspectedColumn));
+                sb.append(" = ");
+                //sb.append(MyBatis3FormattingUtilities.getParameterClause(introspectedColumn));
+                sb.append(" 'Y' ");
+
+
+                if (iter.hasNext()) {
+                    sb.append(',');
+                }
+                answer.addElement(new TextElement(sb.toString()));
+            } else
+            if("update_at".equalsIgnoreCase(introspectedColumn.getActualColumnName())){
+                sb.append(MyBatis3FormattingUtilities
+                        .getEscapedColumnName(introspectedColumn));
+                sb.append(" = ");
+                //sb.append(MyBatis3FormattingUtilities.getParameterClause(introspectedColumn));
+                sb.append(" now() ");
+
+
+                if (iter.hasNext()) {
+                    sb.append(',');
+                }
+                answer.addElement(new TextElement(sb.toString()));
+            } else
+            if("update_by".equalsIgnoreCase(introspectedColumn.getActualColumnName())){
+                sb.append(MyBatis3FormattingUtilities
+                        .getEscapedColumnName(introspectedColumn));
+                sb.append(" = ");
+                //sb.append(MyBatis3FormattingUtilities.getParameterClause(introspectedColumn));
+                sb.append(" #{userId} ");
+
+
+                if (iter.hasNext()) {
+                    sb.append(',');
+                }
+                answer.addElement(new TextElement(sb.toString()));
+
+            }else {
                 continue;
             }
-            sb.append(MyBatis3FormattingUtilities
-                    .getEscapedColumnName(introspectedColumn));
-            sb.append(" = ");
-            //sb.append(MyBatis3FormattingUtilities.getParameterClause(introspectedColumn));
-            sb.append(" 'Y' ");
 
-            /*if (iter.hasNext()) {
-                sb.append(',');
-            }*/
 
-            answer.addElement(new TextElement(sb.toString()));
+
 
             // set up for the next column
             if (iter.hasNext()) {
@@ -92,11 +123,12 @@ public class DeleteFlagSelectiveElementGenerator extends
 
 
 
+        String paramEntity = "entity.";
         for (IntrospectedColumn introspectedColumn : introspectedTable
                 .getAllColumns()) {
             XmlElement isNotNullElement = new XmlElement("if");
             sb.setLength(0);
-            sb.append(introspectedColumn.getJavaProperty());
+            sb.append(paramEntity + introspectedColumn.getJavaProperty());
             sb.append(" != null");
             isNotNullElement.addAttribute(new Attribute("test", sb.toString()));
             trimElement.addElement(isNotNullElement);
@@ -110,7 +142,8 @@ public class DeleteFlagSelectiveElementGenerator extends
                     .getParameterClause(introspectedColumn));
 
 
-            isNotNullElement.addElement(new TextElement(sb.toString()));
+            isNotNullElement.addElement(new TextElement(sb.toString().replace("#{","#{"+paramEntity+"")));
+
         }
 
         parentElement.addElement(answer);

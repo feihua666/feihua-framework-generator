@@ -12,16 +12,21 @@ import org.mybatis.generator.codegen.mybatis3.xmlmapper.elements.AbstractXmlElem
 import java.util.Iterator;
 
 /**
- * 逻辑查询删除
+ * 删除，更新删除标记为删除
  * Created by yangwei
  * Created at 2017/8/25 9:11
  */
-public class DeleteFlagSelectiveElementGenerator extends
+public class DeleteFlagByPrimaryKeysElementGenerator extends
         AbstractXmlElementGenerator {
 
-    public static String statementId = "deleteFlagSelective";
+    public static String statementId = "deleteFlagByPrimaryKeys";
+    private boolean isSimple;
 
-    public DeleteFlagSelectiveElementGenerator() {
+    public DeleteFlagByPrimaryKeysElementGenerator(boolean isSimple) {
+        super();
+        this.isSimple = isSimple;
+    }
+    public DeleteFlagByPrimaryKeysElementGenerator() {
         super();
     }
     public void addElements(XmlElement parentElement) {
@@ -31,15 +36,21 @@ public class DeleteFlagSelectiveElementGenerator extends
                 .addAttribute(new Attribute(
                         "id", statementId));
 
-        String parameterType;
-        if (introspectedTable.getRules().generateRecordWithBLOBsClass()) {
-            parameterType = introspectedTable.getRecordWithBLOBsType();
+        String parameterClass;
+        if (!isSimple && introspectedTable.getRules().generatePrimaryKeyClass()) {
+            parameterClass = introspectedTable.getPrimaryKeyType();
         } else {
-            parameterType = introspectedTable.getBaseRecordType();
+            // PK fields are in the base class. If more than on PK
+            // field, then they are coming in a map.
+            if (introspectedTable.getPrimaryKeyColumns().size() > 1) {
+                parameterClass = "map";
+            } else {
+                parameterClass = introspectedTable.getPrimaryKeyColumns()
+                        .get(0).getFullyQualifiedJavaType().toString();
+            }
         }
-
         answer.addAttribute(new Attribute("parameterType",
-                parameterType));
+                parameterClass));
 
         context.getCommentGenerator().addComment(answer);
 
@@ -80,39 +91,33 @@ public class DeleteFlagSelectiveElementGenerator extends
             }
         }
 
-        XmlElement whereElement = new XmlElement("where");
-        answer.addElement(whereElement);
-
-        XmlElement trimElement = new XmlElement("trim");
-        trimElement.addAttribute(new Attribute("prefix", ""));
-        trimElement.addAttribute(new Attribute("suffix", ""));
-        trimElement.addAttribute(new Attribute("prefixOverrides", "and"));
-        whereElement.addElement(trimElement);
-
-
-
-
+        boolean and = false;
         for (IntrospectedColumn introspectedColumn : introspectedTable
-                .getAllColumns()) {
-            XmlElement isNotNullElement = new XmlElement("if");
+                .getPrimaryKeyColumns()) {
             sb.setLength(0);
-            sb.append(introspectedColumn.getJavaProperty());
-            sb.append(" != null");
-            isNotNullElement.addAttribute(new Attribute("test", sb.toString()));
-            trimElement.addElement(isNotNullElement);
+            if (and) {
+                sb.append("  and "); 
+            } else {
+                sb.append("where "); 
+                and = true;
+            }
 
-            sb.setLength(0);
-            sb.append(" and ");
             sb.append(MyBatis3FormattingUtilities
                     .getEscapedColumnName(introspectedColumn));
-            sb.append(" = ");
-            sb.append(MyBatis3FormattingUtilities
-                    .getParameterClause(introspectedColumn));
+            sb.append(" in ");
+            answer.addElement(new TextElement(sb.toString()));
+            XmlElement foreach = new XmlElement("foreach");
+            foreach.addAttribute(new Attribute("collection", "primaryKeys"));
+            foreach.addAttribute(new Attribute("index", "index"));
+            foreach.addAttribute(new Attribute("item", "item"));
+            foreach.addAttribute(new Attribute("open", "("));
+            foreach.addAttribute(new Attribute("separator", ","));
+            foreach.addAttribute(new Attribute("close", ")"));
+            foreach.addElement(new TextElement("#{item}"));
+            answer.addElement(foreach);
 
-
-            isNotNullElement.addElement(new TextElement(sb.toString()));
+            answer.addElement(new TextElement("and del_flag = 'N'"));
         }
-
         parentElement.addElement(answer);
     }
 }

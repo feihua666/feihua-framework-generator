@@ -2,6 +2,8 @@ package com.feihua.framework.base.pojo;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+
 /**
  * Created by yangwei
  * Created at 2018/4/18 11:42
@@ -64,6 +66,8 @@ public class ControllerModel extends Model{
 
     private String addFormDto;
     private String updateFormDto;
+
+    private List<String> formAttrSet;
 
     public String getControllerComment() {
         return controllerComment;
@@ -186,5 +190,13 @@ public class ControllerModel extends Model{
 
     public void setUpdateFormDto(String updateFormDto) {
         this.updateFormDto = updateFormDto;
+    }
+
+    public List<String> getFormAttrSet() {
+        return formAttrSet;
+    }
+
+    public void setFormAttrSet(List<String> formAttrSet) {
+        this.formAttrSet = formAttrSet;
     }
 }

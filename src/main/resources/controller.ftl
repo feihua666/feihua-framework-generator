@@ -1,9 +1,10 @@
 package com.feihua.framework.rest.modules.${moduleName}.mvc;
 
+import com.feihua.framework.base.modules.role.dto.BaseRoleDto;
 import com.feihua.framework.rest.ResponseJsonRender;
 import com.feihua.framework.rest.interceptor.RepeatFormValidator;
 import com.feihua.framework.rest.modules.common.mvc.BaseController;
-import com.feihua.utils.httpServletResponse.ResponseCode;
+import com.feihua.utils.http.httpServletResponse.ResponseCode;
 import feihua.jdbc.api.pojo.BasePo;
 import feihua.jdbc.api.pojo.PageAndOrderbyParamDto;
 import feihua.jdbc.api.pojo.PageResultDto;
@@ -38,21 +39,23 @@ public class ${controllerName} extends BaseController {
 
     /**
      * 单资源，添加
-     * @param addFormDto
+     * @param dto
      * @return
      */
     @RepeatFormValidator
     @RequiresPermissions("${methodRequiresPermissionsPre}add")
     @RequestMapping(value = "${methodMappingPath}",method = RequestMethod.POST)
-    public ResponseEntity add(${addFormDto} addFormDto){
+    public ResponseEntity add(${addFormDto} dto){
         logger.info("添加${moduleComment}开始");
         logger.info("当前登录用户id:{}",getLoginUser().getId());
         ResponseJsonRender resultData=new ResponseJsonRender();
         // 表单值设置
         ${modelName} basePo = new ${modelName}();
-        //todo
+        <#list formAttrSet as item>
+        ${item}
+        </#list>
 
-        ${serviceApiVarName}.preInsert(basePo,getLoginUser().getId());
+        basePo = ${serviceApiVarName}.preInsert(basePo,getLoginUser().getId());
         ${dtoName} r = ${serviceApiVarName}.insert(basePo);
         if (r == null) {
             // 添加失败
@@ -103,13 +106,13 @@ public class ${controllerName} extends BaseController {
     /**
      * 单资源，更新
      * @param id
-     * @param updateFormDto
+     * @param dto
      * @return
      */
     @RepeatFormValidator
     @RequiresPermissions("${methodRequiresPermissionsPre}update")
     @RequestMapping(value = "${methodMappingPath}/{id}",method = RequestMethod.PUT)
-    public ResponseEntity update(@PathVariable String id, ${updateFormDto} updateFormDto){
+    public ResponseEntity update(@PathVariable String id, ${updateFormDto} dto){
         logger.info("更新${moduleComment}开始");
         logger.info("当前登录用户id:{}",getLoginUser().getId());
         logger.info("${moduleComment}id:{}",id);
@@ -118,15 +121,16 @@ public class ${controllerName} extends BaseController {
         ${modelName} basePo = new ${modelName}();
         // id
         basePo.setId(id);
-        basePo.setDataOfficeId(updateFormDto.getDataOfficeId());
-        //todo
+        <#list formAttrSet as item>
+        ${item}
+        </#list>
 
         // 用条件更新，乐观锁机制
         ${modelName} basePoCondition = new ${modelName}();
         basePoCondition.setId(id);
         basePoCondition.setDelFlag(BasePo.YesNo.N.name());
-        basePoCondition.setUpdateAt(updateFormDto.getUpdateTime());
-        ${serviceApiVarName}.preUpdate(basePo,getLoginUser().getId());
+        basePoCondition.setUpdateAt(dto.getUpdateTime());
+        basePo = ${serviceApiVarName}.preUpdate(basePo,getLoginUser().getId());
         int r = ${serviceApiVarName}.updateSelective(basePo,basePoCondition);
         if (r <= 0) {
             // 更新失败，资源不存在
@@ -179,7 +183,7 @@ public class ${controllerName} extends BaseController {
         PageAndOrderbyParamDto pageAndOrderbyParamDto = new PageAndOrderbyParamDto(PageUtils.getPageFromThreadLocal(), OrderbyUtils.getOrderbyFromThreadLocal());
         // 设置当前登录用户id
         dto.setCurrentUserId(getLoginUser().getId());
-        dto.setCurrentRoleId(getLoginUserRoleId());
+        dto.setCurrentRoleId(((BaseRoleDto) getLoginUser().getRole()).getId());
         PageResultDto<${dtoName}> list = ${serviceApiVarName}.${searchDsfMethodName}(dto,pageAndOrderbyParamDto);
 
         if(CollectionUtils.isNotEmpty(list.getData())){

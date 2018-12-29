@@ -1,5 +1,6 @@
 package com.feihua.framework.base.generator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.TextElement;
@@ -26,8 +27,11 @@ public class SelectListElementGenerator extends
         answer.addAttribute(new Attribute(
                 "id", selectAllStatementId));
 
-        answer.addAttribute(new Attribute("resultMap",
-                introspectedTable.getBaseResultMapId()));
+        String resultMap = introspectedTable.getBaseResultMapId();
+        if(introspectedTable.hasBLOBColumns()){
+            resultMap = introspectedTable.getResultMapWithBLOBsId();
+        }
+        answer.addAttribute(new Attribute("resultMap",resultMap));
         String parameterType;
         if (introspectedTable.getRules().generateRecordWithBLOBsClass()) {
             parameterType = introspectedTable.getRecordWithBLOBsType();

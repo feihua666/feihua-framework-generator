@@ -188,10 +188,18 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
 
         //selectAll 方法
         addSelectAllElement(document.getRootElement());
+        //DeleteByPrimaryKeys 方法
+        addDeleteByPrimaryKeysElement(document.getRootElement());
         //DeleteFlagByPrimaryKey 方法
         addDeleteFlagByPrimaryKeyElement(document.getRootElement());
+        //DeleteFlagByPrimaryKeys 方法
+        addDeleteFlagByPrimaryKeysElement(document.getRootElement());
+        //DeleteFlagByPrimaryKeysWithUpdateUser 方法
+        addDeleteFlagByPrimaryKeysWithUpdateUserElement(document.getRootElement());
         //DeleteFlagSelective 方法
         addDeleteFlagSelectiveElement(document.getRootElement());
+        //DeleteFlagSelectiveWithUpdateUser 方法
+        addDeleteFlagSelectiveWithUpdateUserElement(document.getRootElement());
         //DeleteSelective 方法
         addDeleteSelectiveElement(document.getRootElement());
         //SelectOne 方法
@@ -224,6 +232,8 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         addUpdateBatchByPrimaryKeysElement(document.getRootElement());
         //updateBatchByPrimaryKey 方法
         addUpdateBatchByPrimaryKeyElement(document.getRootElement());
+        //updateBatchByPrimaryKeySelective 方法
+        addUpdateBatchByPrimarySelectiveKeyElement(document.getRootElement());
 
         //updateBatchByPrimaryKeysSelective 方法
         addUpdateBatchByPrimaryKeysSelectiveElement(document.getRootElement());
@@ -340,6 +350,50 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
             apiServiceInterface.addMethod(searchDsfMethod);
         }
 
+        // 重写wrapDto方法
+        {
+            Method searchWrapDtoMethod = new Method();
+            searchWrapDtoMethod.addAnnotation("@Override");
+            searchWrapDtoMethod.setName("wrapDto");
+            searchWrapDtoMethod.setVisibility(JavaVisibility.PUBLIC);
+            searchWrapDtoMethod.addParameter(new Parameter(new FullyQualifiedJavaType(modelName),"po"));
+            List<String> lines = new ArrayList<String>();
+            lines.add("if (po == null) { return null; }");
+            String dto = new FullyQualifiedJavaType(introspectedTable.getContext().getProperty(dtoFullPathKey)).getShortName();
+            lines.add(dto + " dto = new " + dto + "();");
+
+            //添加属性
+            List<IntrospectedColumn> introspectedColumns = introspectedTable.getAllColumns();
+            for (IntrospectedColumn introspectedColumn : introspectedColumns) {
+
+                Method methodGet = getJavaBeansGetter(introspectedColumn, context, introspectedTable);
+                Method methodSet = getJavaBeansSetter(introspectedColumn, context, introspectedTable);
+
+
+                String methodSetName = methodSet.getName();
+                String parentIdXPrefix = "setParentId";
+                if(methodSetName.startsWith(parentIdXPrefix) && methodSetName.length() > parentIdXPrefix.length()){
+                    continue;
+                }
+                if(methodSetName.startsWith("setDelFlag")
+                        || methodSetName.startsWith("setCreateBy")
+                        || methodSetName.startsWith("setCreateAt")
+                        ||methodSetName.startsWith("setUpdateBy")){
+                    continue;
+                }
+
+                if(methodSetName.startsWith("set")){
+
+                    lines.add("dto." + methodSetName + "(po."+ methodGet.getName() +"());");
+                }
+
+            }
+            lines.add("return dto;");
+
+            searchWrapDtoMethod.addBodyLines(lines);
+            searchWrapDtoMethod.setReturnType(new FullyQualifiedJavaType(dto));
+            apiServiceInterface.addMethod(searchWrapDtoMethod);
+        }
 
         context.getCommentGenerator().addJavaFileComment(apiServiceInterface);
         GeneratedJavaFile apiServiceFile =  new GeneratedJavaFile(apiServiceInterface,
@@ -392,6 +446,21 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         imports.add(introspectedTable.getContext().getProperty(controllerAddUpdateFullPathKey));
         imports.add(introspectedTable.getBaseRecordType());
         controllerModel.setImportList(imports);
+
+        // form
+        List<String> formAttrSet = new ArrayList<>();
+        List<IntrospectedColumn> introspectedColumns = introspectedTable.getAllColumns();
+        for (IntrospectedColumn introspectedColumn : introspectedColumns) {
+            Method methodGet = getJavaBeansGetter(introspectedColumn, context, introspectedTable);
+            Method methodSet = getJavaBeansSetter(introspectedColumn, context, introspectedTable);
+            formAttrSet.add("basePo." + methodSet.getName() + "(dto."+ methodGet.getName() +"());");
+            /*Method method = getJavaBeansGetter(introspectedColumn, context, introspectedTable);
+            method.getJavaDocLines().clear();
+            dtoClass.addMethod(method);
+            method = getJavaBeansSetter(introspectedColumn, context, introspectedTable);
+            dtoClass.addMethod(method);*/
+        }
+        controllerModel.setFormAttrSet(formAttrSet);
         String r = FreeMarkerTemplateUtils.processTemplateIntoString(template,controllerModel);
 
         String filePath = MybatisGeneratorConfig.getProperty("controller.targetProject")
@@ -568,9 +637,11 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         String modelName = introspectedTable.getTableConfiguration().getDomainObjectName();
 
         FullyQualifiedJavaType dtoType = new FullyQualifiedJavaType(context.getJavaModelGeneratorConfiguration().getTargetPackage().substring(0,context.getJavaModelGeneratorConfiguration().getTargetPackage().lastIndexOf("."))+".dto."+modelName.replace("Po","")+"Dto");
+
         TopLevelClass dtoClass = new TopLevelClass(dtoType);
         dtoClass.setVisibility(JavaVisibility.PUBLIC);
         FullyQualifiedJavaType dtosuperClass = new FullyQualifiedJavaType(MybatisGeneratorConfig.getProperty("pojo.basedto"));
+        dtosuperClass.addTypeArgument(new FullyQualifiedJavaType("String"));
         dtoClass.setSuperClass(new FullyQualifiedJavaType(dtosuperClass.getShortName()));
         dtoClass.addImportedType(dtosuperClass);
         introspectedTable.getContext().addProperty(dtoFullPathKey,dtoType.getFullyQualifiedName());
@@ -605,13 +676,29 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         AbstractXmlElementGenerator elementGenerator = new SelectAllElementGenerator();
         initializeAndExecuteGenerator(elementGenerator, parentElement);
     }
+
+    protected void addDeleteByPrimaryKeysElement(XmlElement parentElement) {
+        DeleteByPrimaryKeysElementGenerator elementGenerator = new DeleteByPrimaryKeysElementGenerator();
+        initializeAndExecuteGenerator(elementGenerator, parentElement);
+    }
     protected void addDeleteFlagByPrimaryKeyElement(XmlElement parentElement) {
         DeleteFlagByPrimaryKeyElementGenerator elementGenerator = new DeleteFlagByPrimaryKeyElementGenerator();
         initializeAndExecuteGenerator(elementGenerator, parentElement);
     }
-
+    protected void addDeleteFlagByPrimaryKeysElement(XmlElement parentElement) {
+        DeleteFlagByPrimaryKeysElementGenerator elementGenerator = new DeleteFlagByPrimaryKeysElementGenerator();
+        initializeAndExecuteGenerator(elementGenerator, parentElement);
+    }
+    protected void addDeleteFlagByPrimaryKeysWithUpdateUserElement(XmlElement parentElement) {
+        DeleteFlagByPrimaryKeysWithUpdateUserElementGenerator elementGenerator = new DeleteFlagByPrimaryKeysWithUpdateUserElementGenerator();
+        initializeAndExecuteGenerator(elementGenerator, parentElement);
+    }
     protected void addDeleteFlagSelectiveElement(XmlElement parentElement) {
         DeleteFlagSelectiveElementGenerator elementGenerator = new DeleteFlagSelectiveElementGenerator();
+        initializeAndExecuteGenerator(elementGenerator, parentElement);
+    }
+    protected void addDeleteFlagSelectiveWithUpdateUserElement(XmlElement parentElement) {
+        DeleteFlagSelectiveWithUpdateUserElementGenerator elementGenerator = new DeleteFlagSelectiveWithUpdateUserElementGenerator();
         initializeAndExecuteGenerator(elementGenerator, parentElement);
     }
     protected void addDeleteSelectiveElement(XmlElement parentElement) {
@@ -676,6 +763,10 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
     }
     protected void addUpdateBatchByPrimaryKeyElement(XmlElement parentElement) {
         UpdateBatchByPrimaryKeyElementGenerator elementGenerator = new UpdateBatchByPrimaryKeyElementGenerator();
+        initializeAndExecuteGenerator(elementGenerator, parentElement);
+    }
+    protected void addUpdateBatchByPrimarySelectiveKeyElement(XmlElement parentElement) {
+        UpdateBatchByPrimaryKeySelectiveElementGenerator elementGenerator = new UpdateBatchByPrimaryKeySelectiveElementGenerator();
         initializeAndExecuteGenerator(elementGenerator, parentElement);
     }
     protected void addUpdateBatchByPrimaryKeysSelectiveElement(XmlElement parentElement) {

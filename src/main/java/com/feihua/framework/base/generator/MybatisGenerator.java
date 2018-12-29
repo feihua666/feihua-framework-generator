@@ -401,6 +401,7 @@ public class MybatisGenerator {
         BufferedWriter bw = new BufferedWriter(osw);
         bw.write(content);
         bw.close();
+        System.out.println(file.getAbsolutePath());
     }
 
     /**
