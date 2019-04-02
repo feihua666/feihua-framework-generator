@@ -1,0 +1,7 @@
+修改配置文件后请修改
+  com.feihua.framework.base.generator.MybatisGeneratorConfig.propertyPath
+  （private static String[] propertyPath = {"init_wwd_yangwei.properties"};）
+  和
+  generatorConfig.xml:8
+  （<properties resource="init_wwd_yangwei.properties"/>）
+  两个地方
