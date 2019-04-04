@@ -1,4 +1,4 @@
-package com.feihua.framework.rest.modules.${moduleName}.mvc;
+package ${controllerTargetPackage};
 
 import com.feihua.framework.base.modules.role.dto.BaseRoleDto;
 import com.feihua.framework.rest.ResponseJsonRender;

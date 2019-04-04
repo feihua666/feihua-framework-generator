@@ -1,6 +1,7 @@
 package com.feihua.framework.base.generator;
 
 import com.feihua.framework.base.pojo.ControllerModel;
+import com.feihua.framework.base.pojo.VueWebPcMadel;
 import com.feihua.utils.io.FileUtils;
 import com.feihua.utils.spring.SpringContextHolder;
 import com.github.pagehelper.Page;
@@ -271,6 +272,15 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
                 e.printStackTrace();
             }
         }
+        if(MybatisGeneratorConfig.getBoolean("generator.vueWebPc")){
+            try {
+                addVueWecPc(introspectedTable);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (TemplateException e) {
+                e.printStackTrace();
+            }
+        }
 
         return result;
     }
@@ -422,9 +432,9 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         Template template = cfg.getTemplate("controller.ftl");
 
         ControllerModel controllerModel = new ControllerModel();
+        controllerModel.setControllerTargetPackage(MybatisGeneratorConfig.getProperty("controller.targetPackage"));
         controllerModel.setModelName(modelName);
         controllerModel.setModuleComment(MybatisGeneratorConfig.getProperty("controller.moduleComment"));
-        controllerModel.setModuleName(MybatisGeneratorConfig.getProperty("controller.moduleName"));
         controllerModel.setClassMappingPath(MybatisGeneratorConfig.getProperty("controller.classMappingPath"));
         controllerModel.setControllerComment(MybatisGeneratorConfig.getProperty("controller.controllerComment"));
         controllerModel.setControllerName(modelName.replace("Po","") + "Controller");
@@ -470,6 +480,53 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
 
         FileUtils.createFolder(filePath);
         FileUtils.writeString(FileUtils.createFile(filePath +  controllerModel.getControllerName() + ".java" ),r);
+    }
+    private void addVueWecPc(IntrospectedTable introspectedTable) throws IOException, TemplateException {
+        String modelName = MybatisGeneratorConfig.getProperty("vueWebPc.listComponentName");
+
+
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
+        cfg.setClassForTemplateLoading(this.getClass(),"/");
+        cfg.setDefaultEncoding("UTF-8");
+        cfg.unsetCacheStorage();
+        VueWebPcMadel model = new VueWebPcMadel();
+        List<String> properties = new ArrayList<>();
+        List<IntrospectedColumn> introspectedColumns = introspectedTable.getAllColumns();
+        for (IntrospectedColumn introspectedColumn : introspectedColumns) {
+            if(StringUtils.containsAny(introspectedColumn.getJavaProperty(),
+                    "delFlag","createAt","createBy","updateAt","updateBy")){
+                continue;
+            }
+            properties.add(introspectedColumn.getJavaProperty());
+        }
+        model.setProperties(properties);
+        model.setCrudUrl(MybatisGeneratorConfig.getProperty("vueWebPc.crudUrl"));
+        model.setModelName(MybatisGeneratorConfig.getProperty("vueWebPc.listComponentName"));
+        model.setModuleSimpleComment(MybatisGeneratorConfig.getProperty("vueWebPc.moduleSimpleComment"));
+
+        String filePath = MybatisGeneratorConfig.getProperty("vueWebPc.targetProject") +
+                MybatisGeneratorConfig.getProperty("vueWebPc.targetPath");
+
+
+        // list
+        Template template = cfg.getTemplate("vue-web-pc-list.ftl");
+        String r = FreeMarkerTemplateUtils.processTemplateIntoString(template,model);
+
+        FileUtils.createFolder(filePath);
+        FileUtils.writeString(FileUtils.createFile(filePath + "/" + modelName + ".vue" ),r);
+
+        // add
+        template = cfg.getTemplate("vue-web-pc-add.ftl");
+        r = FreeMarkerTemplateUtils.processTemplateIntoString(template,model);
+
+        FileUtils.createFolder(filePath);
+        FileUtils.writeString(FileUtils.createFile(filePath + "/" + modelName + "Add.vue" ),r);
+        // add
+        template = cfg.getTemplate("vue-web-pc-edit.ftl");
+        r = FreeMarkerTemplateUtils.processTemplateIntoString(template,model);
+
+        FileUtils.createFolder(filePath);
+        FileUtils.writeString(FileUtils.createFile(filePath + "/" + modelName + "Edit.vue" ),r);
     }
     private GeneratedJavaFile addAddFormDto(IntrospectedTable introspectedTable){
         String modelName = introspectedTable.getTableConfiguration().getDomainObjectName();

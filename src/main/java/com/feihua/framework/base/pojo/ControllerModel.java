@@ -14,6 +14,8 @@ public class ControllerModel extends Model{
      * 类名称注释
      */
     private String controllerComment;
+    private String controllerTargetPackage;
+
     /**
      * 类名前缀
      */
@@ -58,11 +60,6 @@ public class ControllerModel extends Model{
      * dtoname
      */
     private String dtoName;
-
-    /**
-     * 模块名
-     */
-    private String moduleName;
 
     private String addFormDto;
     private String updateFormDto;
@@ -168,13 +165,6 @@ public class ControllerModel extends Model{
         this.dtoName = dtoName;
     }
 
-    public String getModuleName() {
-        return moduleName;
-    }
-
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
-    }
 
     public String getAddFormDto() {
         return addFormDto;
@@ -198,5 +188,13 @@ public class ControllerModel extends Model{
 
     public void setFormAttrSet(List<String> formAttrSet) {
         this.formAttrSet = formAttrSet;
+    }
+
+    public String getControllerTargetPackage() {
+        return controllerTargetPackage;
+    }
+
+    public void setControllerTargetPackage(String controllerTargetPackage) {
+        this.controllerTargetPackage = controllerTargetPackage;
     }
 }
