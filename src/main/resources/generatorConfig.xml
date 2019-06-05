@@ -5,7 +5,7 @@
 
 <generatorConfiguration>
 
-    <properties resource="init_framework_yangwei_base.properties"/>
+    <properties resource="init_framework_yangwei_statistic.properties"/>
     <classPathEntry
             location="${jdbc.connector.jar}"/>
     <context id="Oracle" targetRuntime="MyBatis3" defaultModelType="flat">

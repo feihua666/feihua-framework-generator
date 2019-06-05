@@ -1,7 +1,5 @@
 <template>
-
-    <div class="wrapper">
-        <el-container>
+    <el-container class="fh-page-wrapper">
             <el-main>
                 <el-collapse value="1">
                     <el-collapse-item title="查询条件" name="1">
@@ -13,8 +11,8 @@
                             </#list>
 
                             <el-form-item>
-                                <el-button type="primary" @click="searchBtnClick">查询</el-button>
-                                <el-button type="primary" @click="addTableRowClick">添加</el-button>
+                                <el-button type="primary" icon="el-icon-search" @click="searchBtnClick">查询</el-button>
+                                <el-button type="primary" icon="el-icon-plus" @click="addTableRowClick">添加</el-button>
                             </el-form-item>
                         </el-form>
                     </el-collapse-item>
@@ -23,7 +21,6 @@
             </el-main>
         </el-container>
 
-    </div>
 </template>
 
 <script>
@@ -69,7 +66,6 @@
                 tableLoading: false,
                 // 搜索的查询条件
                 searchFormModel: {
-                    leaveType: '',
                     pageable: true,
                     pageNo: 1,
                     pageSize: 10
@@ -125,6 +121,7 @@
             },
             // tablb 表格编辑行
             editTableRowClick (index, row) {
+                this.$utils.loadDataControl.add('${modelName}EditLoadData=true')
                 this.$router.push('/Main/${modelName}/${modelName}Edit/' + row.id)
             },
             // tablb 表格删除行
@@ -158,16 +155,4 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-    .wrapper .el-collapse{
-        padding: 0 10px;
-    }
-    .el-main{
-        padding:0;
-    }
-    .el-aside{
-        border-right: 1px solid #e6ebf5;
-    }
-    .wrapper,.el-container{
-        height:100%;
-    }
 </style>

@@ -2,8 +2,7 @@ package ${controllerTargetPackage};
 
 import com.feihua.framework.base.modules.role.dto.BaseRoleDto;
 import com.feihua.framework.rest.ResponseJsonRender;
-import com.feihua.framework.rest.interceptor.RepeatFormValidator;
-import com.feihua.framework.rest.modules.common.mvc.BaseController;
+    import com.feihua.framework.rest.mvc.SuperController;
 import com.feihua.utils.http.httpServletResponse.ResponseCode;
 import feihua.jdbc.api.pojo.BasePo;
 import feihua.jdbc.api.pojo.PageAndOrderbyParamDto;
@@ -30,7 +29,7 @@ import ${item};
  */
 @RestController
 @RequestMapping("${classMappingPath}")
-public class ${controllerName} extends BaseController {
+public class ${controllerName} extends SuperController {
 
     private static Logger logger = LoggerFactory.getLogger(${controllerName}.class);
 
@@ -48,7 +47,7 @@ public class ${controllerName} extends BaseController {
     public ResponseEntity add(${addFormDto} dto){
         logger.info("添加${moduleComment}开始");
         logger.info("当前登录用户id:{}",getLoginUser().getId());
-        ResponseJsonRender resultData=new ResponseJsonRender();
+        ResponseJsonRender resultData = new ResponseJsonRender();
         // 表单值设置
         ${modelName} basePo = new ${modelName}();
         <#list formAttrSet as item>
@@ -85,7 +84,7 @@ public class ${controllerName} extends BaseController {
         logger.info("删除${moduleComment}开始");
         logger.info("用户id:{}",getLoginUser().getId());
         logger.info("${moduleComment}id:{}",id);
-        ResponseJsonRender resultData=new ResponseJsonRender();
+        ResponseJsonRender resultData = new ResponseJsonRender();
 
             int r = ${serviceApiVarName}.deleteFlagByPrimaryKeyWithUpdateUser(id,getLoginUser().getId());
             if (r <= 0) {
@@ -116,7 +115,7 @@ public class ${controllerName} extends BaseController {
         logger.info("更新${moduleComment}开始");
         logger.info("当前登录用户id:{}",getLoginUser().getId());
         logger.info("${moduleComment}id:{}",id);
-        ResponseJsonRender resultData=new ResponseJsonRender();
+        ResponseJsonRender resultData = new ResponseJsonRender();
         // 表单值设置
         ${modelName} basePo = new ${modelName}();
         // id
@@ -157,7 +156,7 @@ public class ${controllerName} extends BaseController {
     @RequestMapping(value = "${methodMappingPath}/{id}",method = RequestMethod.GET)
     public ResponseEntity getById(@PathVariable String id){
 
-        ResponseJsonRender resultData=new ResponseJsonRender();
+        ResponseJsonRender resultData = new ResponseJsonRender();
         ${dtoName} baseDataScopeDto = ${serviceApiVarName}.selectByPrimaryKey(id,false);
         if(baseDataScopeDto != null){
             resultData.setData(baseDataScopeDto);
@@ -179,21 +178,15 @@ public class ${controllerName} extends BaseController {
     @RequestMapping(value = "${methodMappingPath}s",method = RequestMethod.GET)
     public ResponseEntity search(${searchConditionDtoName} dto){
 
-        ResponseJsonRender resultData=new ResponseJsonRender();
+        ResponseJsonRender resultData = new ResponseJsonRender();
         PageAndOrderbyParamDto pageAndOrderbyParamDto = new PageAndOrderbyParamDto(PageUtils.getPageFromThreadLocal(), OrderbyUtils.getOrderbyFromThreadLocal());
         // 设置当前登录用户id
         dto.setCurrentUserId(getLoginUser().getId());
         dto.setCurrentRoleId(((BaseRoleDto) getLoginUser().getRole()).getId());
         PageResultDto<${dtoName}> list = ${serviceApiVarName}.${searchDsfMethodName}(dto,pageAndOrderbyParamDto);
 
-        if(CollectionUtils.isNotEmpty(list.getData())){
-            resultData.setData(list.getData());
-            resultData.setPage(list.getPage());
-            return new ResponseEntity(resultData, HttpStatus.OK);
-        }else{
-            resultData.setCode(ResponseCode.E404_100001.getCode());
-            resultData.setMsg(ResponseCode.E404_100001.getMsg());
-            return new ResponseEntity(resultData,HttpStatus.NOT_FOUND);
-        }
+        resultData.setPage(list.getPage());
+        return returnList(list.getData(),resultData);
+
     }
 }

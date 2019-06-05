@@ -2,9 +2,12 @@ package com.feihua.framework.base.generator;
 
 import feihua.jdbc.api.pojo.BasePo;
 import org.apache.commons.lang3.StringUtils;
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
+import org.mybatis.generator.codegen.mybatis3.ListUtilities;
+import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
 import org.mybatis.generator.codegen.mybatis3.xmlmapper.elements.AbstractXmlElementGenerator;
 import org.mybatis.generator.config.PropertyRegistry;
 import org.mybatis.generator.internal.util.StringUtility;
@@ -55,6 +58,31 @@ public class SearchDsfElementGenerator extends
         sb.setLength(0);
         sb.append(" where del_flag = ").append("'").append(BasePo.YesNo.N.name()).append("'");
         answer.addElement(new TextElement(sb.toString()));
+
+        for (IntrospectedColumn introspectedColumn : ListUtilities.removeGeneratedAlwaysColumns(introspectedTable
+                .getNonPrimaryKeyColumns())) {
+            XmlElement isNotNullElement = new XmlElement("if"); //$NON-NLS-1$
+            sb.setLength(0);
+            sb.append(introspectedColumn.getJavaProperty());
+            sb.append(" != null");
+            sb.append(" and ");
+            sb.append(introspectedColumn.getJavaProperty());
+            sb.append(" != ''");
+            isNotNullElement.addAttribute(new Attribute("test", sb.toString())); //$NON-NLS-1$
+
+
+            sb.setLength(0);
+            sb.append("and ");
+            sb.append(MyBatis3FormattingUtilities
+                    .getEscapedColumnName(introspectedColumn));
+            sb.append(" = "); //$NON-NLS-1$
+            sb.append(MyBatis3FormattingUtilities
+                    .getParameterClause(introspectedColumn));
+
+            isNotNullElement.addElement(new TextElement(sb.toString()));
+            answer.addElement(isNotNullElement);
+        }
+
 
         String orderByClause = introspectedTable.getTableConfigurationProperty(PropertyRegistry.TABLE_SELECT_ALL_ORDER_BY_CLAUSE);
         boolean hasOrderBy = StringUtility.stringHasValue(orderByClause);

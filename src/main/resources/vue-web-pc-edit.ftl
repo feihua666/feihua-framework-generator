@@ -1,13 +1,14 @@
 <template>
-    <div class="wrapper">
-        <el-form ref="form" :model="form" :rules="formRules" style="width: 460px;" label-width="100px" v-loading="formDataLoading">
+
+    <div class="fh-page-wrapper">
+        <el-form ref="form" class="fh-background-white fh-padding-30" :model="form" :rules="formRules" style="width: 460px;" label-width="100px" v-loading="formDataLoading">
             <#list properties as property>
                 <el-form-item label="" prop="${property}">
             <el-input  v-model="form.${property}"></el-input>
                 </el-form-item>
             </#list>
             <el-form-item>
-                <el-button type="primary" @click="updateBtnClick" :loading="addLoading">修改</el-button>
+                <el-button type="primary" icon="el-icon-check" @click="updateBtnClick" :loading="addLoading">修改</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -100,7 +101,8 @@
         beforeRouteEnter  (to, from, next) {
             next(vm => {
                 // 通过 `vm` 访问组件实例
-                if (vm.id !== vm.$route.params.id) {
+                let dataControl = '${modelName}EditLoadData=true'
+                if (vm.id !== vm.$route.params.id || vm.$utils.loadDataControl.has(dataControl)) {
                     vm.id = vm.$route.params.id
                     vm.loadEditData(vm.id)
                 }
@@ -111,7 +113,5 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-    .wrapper{
-        padding:1.5rem;
-    }
+
 </style>
