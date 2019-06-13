@@ -1,6 +1,7 @@
 package com.feihua.framework.base.pojo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yangwei
@@ -10,7 +11,7 @@ public class VueWebPcMadel {
     /**
      * java 属性
      */
-    List<String> properties;
+    List<Map<String,String>> properties;
     /**
      * 模型名
      */
@@ -25,11 +26,11 @@ public class VueWebPcMadel {
     private String moduleSimpleComment = "";
 
 
-    public List<String> getProperties() {
+    public List<Map<String, String>> getProperties() {
         return properties;
     }
 
-    public void setProperties(List<String> properties) {
+    public void setProperties(List<Map<String, String>> properties) {
         this.properties = properties;
     }
 

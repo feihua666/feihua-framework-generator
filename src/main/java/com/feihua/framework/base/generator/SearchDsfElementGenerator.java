@@ -27,7 +27,7 @@ public class SearchDsfElementGenerator extends
     }
     public void addElements(XmlElement parentElement) {
         XmlElement answer = new XmlElement("select");
-        selectAllStatementId = selectAllStatementId.replace("#{param}",getIntrospectedTable().getTableConfiguration().getDomainObjectName().replace("Po",""));
+        selectAllStatementId = selectAllStatementId.replace("#{param}",Utils.cutEndPo(getIntrospectedTable().getTableConfiguration().getDomainObjectName()));
 
         answer.addAttribute(new Attribute(
                 "id", selectAllStatementId));

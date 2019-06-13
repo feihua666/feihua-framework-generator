@@ -2,8 +2,8 @@
     <div class="fh-page-wrapper">
         <el-form ref="form" class="fh-background-white fh-padding-30" :model="form" :rules="formRules" style="width: 460px;" label-width="100px">
             <#list properties as property>
-                <el-form-item label="" prop="${property}">
-            <el-input  v-model="form.${property}"></el-input>
+                <el-form-item label="${property.remarks}" prop="${property.property}">
+            <el-input  v-model="form.${property.property}"></el-input>
                 </el-form-item>
             </#list>
             <el-form-item>
@@ -24,13 +24,13 @@
             return {
                 form: {
                     <#list properties as property>
-                    ${property}: '',
+                    ${property.property}: '',
                     </#list>
                 },
                 addLoading: false,
                 formRules: {
                 <#list properties as property>
-                    ${property}: [
+                    ${property.property}: [
                         {required: true, message: '必填', trigger: 'blur'}
                     ],
                 </#list>
@@ -50,7 +50,7 @@
                             self.addLoading = true
                             self.$http.post('${crudUrl}', self.form)
                                 .then(function (response) {
-                                    self.$message.info('${moduleSimpleComment}添加成功')
+                                    self.$message.success('${moduleSimpleComment}添加成功')
                                     self.addLoading = false
                                 })
                                 .catch(function (response) {

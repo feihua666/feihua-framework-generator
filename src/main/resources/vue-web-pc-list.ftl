@@ -5,14 +5,15 @@
                     <el-collapse-item title="查询条件" name="1">
                         <el-form ref="searchForm" :model="searchFormModel" :inline="true" size="small">
                             <#list properties as property>
-                                <el-form-item label="" prop="${property}">
-                                    <el-input  v-model="searchFormModel.${property}"></el-input>
+                                <el-form-item label="${property.remarks}" prop="${property.property}">
+                                    <el-input  v-model="searchFormModel.${property.property}"></el-input>
                                 </el-form-item>
                             </#list>
 
                             <el-form-item>
                                 <el-button type="primary" icon="el-icon-search" @click="searchBtnClick">查询</el-button>
                                 <el-button type="primary" icon="el-icon-plus" @click="addTableRowClick">添加</el-button>
+                                <el-button type="warning" icon="el-icon-refresh" @click="resetFormClick">重置</el-button>
                             </el-form-item>
                         </el-form>
                     </el-collapse-item>
@@ -39,8 +40,8 @@
                 columns: [
                     <#list properties as property>
                     {
-                        name: '${property}',
-                        label: ''
+                        name: '${property.property}',
+                        label: '${property.remarks}'
                     },
                     </#list>
                     {
@@ -48,10 +49,14 @@
                         buttons: [
                             {
                                 label: '编辑',
+                                styleType: 'primary',
+                                icon: 'el-icon-edit',
                                 click: this.editTableRowClick
                             },
                             {
                                 label: '删除',
+                                styleType: 'danger',
+                                icon: 'el-icon-delete',
                                 click: this.deleteTableRowClick
                             }
                         ]
@@ -146,6 +151,9 @@
             addTableRowClick () {
                 this.$utils.loadDataControl.add('${modelName}AddLoadData=true')
                 this.$router.push('/Main/${modelName}/${modelName}Add')
+            },
+            resetFormClick () {
+                this.$refs.searchForm.resetFields()
             }
         },
         watch: {

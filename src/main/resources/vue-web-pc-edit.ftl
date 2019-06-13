@@ -3,8 +3,8 @@
     <div class="fh-page-wrapper">
         <el-form ref="form" class="fh-background-white fh-padding-30" :model="form" :rules="formRules" style="width: 460px;" label-width="100px" v-loading="formDataLoading">
             <#list properties as property>
-                <el-form-item label="" prop="${property}">
-            <el-input  v-model="form.${property}"></el-input>
+                <el-form-item label="${property.remarks}" prop="${property.property}">
+            <el-input  v-model="form.${property.property}"></el-input>
                 </el-form-item>
             </#list>
             <el-form-item>
@@ -27,7 +27,7 @@
                 id: null,
                 form: {
                     <#list properties as property>
-                    ${property}: '',
+                    ${property.property}: '',
                         </#list>
                     updateTime: null
                 },
@@ -35,7 +35,7 @@
                 addLoading: false,
                 formRules: {
                 <#list properties as property>
-                ${property}: [
+                ${property.property}: [
                     {required: true, message: '必填', trigger: 'blur'}
                 ],
                 </#list>
@@ -48,6 +48,9 @@
         },
         methods: {
             loadEditData (id) {
+                if (this.formDataLoading === true) {
+                    return
+                }
                 this.resetForm()
                 let self = this
                 self.formDataLoading = true
@@ -55,7 +58,7 @@
                     .then(function (response) {
                         let content = response.data.data.content
                         <#list properties as property>
-                        self.form.${property} = content.${property}
+                        self.form.${property.property} = content.${property.property}
                             </#list>
                         self.form.updateTime = content.updateAt
                         self.formDataLoading = false
@@ -74,7 +77,7 @@
                             self.addLoading = true
                             self.$http.put('${crudUrl}/' + self.id, self.form)
                                 .then(function (response) {
-                                    self.$message.info('${moduleSimpleComment}修改成功')
+                                    self.$message.success('${moduleSimpleComment}修改成功')
                                     self.addLoading = false
                                 })
                                 .catch(function (response) {
@@ -105,6 +108,7 @@
                 if (vm.id !== vm.$route.params.id || vm.$utils.loadDataControl.has(dataControl)) {
                     vm.id = vm.$route.params.id
                     vm.loadEditData(vm.id)
+                    vm.$utils.loadDataControl.remove(dataControl)
                 }
             })
         }

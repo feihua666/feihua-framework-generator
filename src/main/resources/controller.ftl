@@ -151,7 +151,6 @@ public class ${controllerName} extends SuperController {
      * @param id
      * @return
      */
-    @RepeatFormValidator
     @RequiresPermissions("${methodRequiresPermissionsPre}getById")
     @RequestMapping(value = "${methodMappingPath}/{id}",method = RequestMethod.GET)
     public ResponseEntity getById(@PathVariable String id){
@@ -173,7 +172,6 @@ public class ${controllerName} extends SuperController {
      * @param dto
      * @return
      */
-    @RepeatFormValidator
     @RequiresPermissions("${methodRequiresPermissionsPre}search")
     @RequestMapping(value = "${methodMappingPath}s",method = RequestMethod.GET)
     public ResponseEntity search(${searchConditionDtoName} dto){

@@ -19,7 +19,7 @@ import java.util.Properties;
 public class MybatisGeneratorConfig {
     private static Logger logger = LoggerFactory.getLogger(MybatisGeneratorConfig.class);
 
-    private static String[] propertyPath = {"init_framework_yangwei_statistic.properties"};
+    private static String[] propertyPath = {"init_framework_yangwei_base.properties"};
 
 
     private static Properties properties = null;

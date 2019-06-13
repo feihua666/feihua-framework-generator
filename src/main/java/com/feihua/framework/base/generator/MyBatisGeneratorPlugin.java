@@ -27,9 +27,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.mybatis.generator.internal.util.JavaBeansUtil.getJavaBeansField;
 import static org.mybatis.generator.internal.util.JavaBeansUtil.getJavaBeansGetter;
@@ -161,7 +159,7 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         }
 
             Method searchDsfMethod = new Method();
-            searchDsfMethod.setName(SearchDsfElementGenerator.selectAllStatementId.replace("#{param}",modelName.replace("Po","")));
+            searchDsfMethod.setName(SearchDsfElementGenerator.selectAllStatementId.replace("#{param}",Utils.cutEndPo(modelName)));
             searchDsfMethod.setVisibility(JavaVisibility.PUBLIC);
             // 返回类型
             FullyQualifiedJavaType returnType = new FullyQualifiedJavaType(List.class.getName());
@@ -171,7 +169,7 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
             FullyQualifiedJavaType dtoType = new FullyQualifiedJavaType(
                     context.getJavaModelGeneratorConfiguration().getTargetPackage()
                             .substring(0,context.getJavaModelGeneratorConfiguration().getTargetPackage().lastIndexOf("."))
-                            +".dto.Search"+modelName.replace("Po","")+"sConditionDto");
+                            +".dto.Search" + Utils.cutEndPo(modelName) + "sConditionDto");
             FullyQualifiedJavaType parameterType = dtoType;
             searchDsfMethod.addParameter(new Parameter(parameterType,"dto"));
         // 添加searchDsf方法
@@ -437,7 +435,7 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         controllerModel.setModuleComment(MybatisGeneratorConfig.getProperty("controller.moduleComment"));
         controllerModel.setClassMappingPath(MybatisGeneratorConfig.getProperty("controller.classMappingPath"));
         controllerModel.setControllerComment(MybatisGeneratorConfig.getProperty("controller.controllerComment"));
-        controllerModel.setControllerName(modelName.replace("Po","") + "Controller");
+        controllerModel.setControllerName(Utils.cutEndPo(modelName) + "Controller");
         controllerModel.setDtoName(StringUtils.substringAfterLast(introspectedTable.getContext().getProperty(dtoFullPathKey),"."));
         controllerModel.setMethodMappingPath(MybatisGeneratorConfig.getProperty("controller.methodMappingPath"));
         controllerModel.setMethodRequiresPermissionsPre(MybatisGeneratorConfig.getProperty("controller.methodRequiresPermissionsPre"));
@@ -490,14 +488,17 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         cfg.setDefaultEncoding("UTF-8");
         cfg.unsetCacheStorage();
         VueWebPcMadel model = new VueWebPcMadel();
-        List<String> properties = new ArrayList<>();
+        List<Map<String, String>> properties = new ArrayList<>();
         List<IntrospectedColumn> introspectedColumns = introspectedTable.getAllColumns();
         for (IntrospectedColumn introspectedColumn : introspectedColumns) {
             if(StringUtils.containsAny(introspectedColumn.getJavaProperty(),
                     "delFlag","createAt","createBy","updateAt","updateBy")){
                 continue;
             }
-            properties.add(introspectedColumn.getJavaProperty());
+            Map<String, String> m = new HashMap<>();
+            m.put("property",introspectedColumn.getJavaProperty());
+            m.put("remarks",introspectedColumn.getRemarks());
+            properties.add(m);
         }
         model.setProperties(properties);
         model.setCrudUrl(MybatisGeneratorConfig.getProperty("vueWebPc.crudUrl"));
@@ -532,7 +533,7 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         String modelName = introspectedTable.getTableConfiguration().getDomainObjectName();
 
         FullyQualifiedJavaType dtoType = new FullyQualifiedJavaType(MybatisGeneratorConfig.getProperty("controller.dto.targetPackage")
-                + ".Add"+modelName.replace("Po","FormDto"));
+                + ".Add"+Utils.cutEndPo(modelName) + "FormDto");
 
         TopLevelClass dtoClass = new TopLevelClass(dtoType);
         dtoClass.setVisibility(JavaVisibility.PUBLIC);
@@ -564,7 +565,7 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
         String modelName = introspectedTable.getTableConfiguration().getDomainObjectName();
 
         FullyQualifiedJavaType dtoType = new FullyQualifiedJavaType(MybatisGeneratorConfig.getProperty("controller.dto.targetPackage")
-        + ".Update"+modelName.replace("Po","FormDto"));
+        + ".Update" + Utils.cutEndPo(modelName)+"FormDto");
 
         TopLevelClass dtoClass = new TopLevelClass(dtoType);
         dtoClass.setVisibility(JavaVisibility.PUBLIC);
@@ -621,7 +622,7 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
 
 
             Method searchDsfMethod = new Method();
-            searchDsfMethod.setName("search" + modelName.replace("Po","") + "sDsf");
+            searchDsfMethod.setName("search" + Utils.cutEndPo(modelName) + "sDsf");
             searchDsfMethod.setVisibility(JavaVisibility.PUBLIC);
             // 返回类型
             FullyQualifiedJavaType returnType = new FullyQualifiedJavaType(PageResultDto.class.getSimpleName());
@@ -693,7 +694,7 @@ public class MyBatisGeneratorPlugin extends BaseMyBatisGeneratorPlugin {
     private GeneratedJavaFile addDto(IntrospectedTable introspectedTable){
         String modelName = introspectedTable.getTableConfiguration().getDomainObjectName();
 
-        FullyQualifiedJavaType dtoType = new FullyQualifiedJavaType(context.getJavaModelGeneratorConfiguration().getTargetPackage().substring(0,context.getJavaModelGeneratorConfiguration().getTargetPackage().lastIndexOf("."))+".dto."+modelName.replace("Po","")+"Dto");
+        FullyQualifiedJavaType dtoType = new FullyQualifiedJavaType(context.getJavaModelGeneratorConfiguration().getTargetPackage().substring(0,context.getJavaModelGeneratorConfiguration().getTargetPackage().lastIndexOf("."))+".dto."+Utils.cutEndPo(modelName)+"Dto");
 
         TopLevelClass dtoClass = new TopLevelClass(dtoType);
         dtoClass.setVisibility(JavaVisibility.PUBLIC);
